@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 function Sidebar() {
   const navItems = [
@@ -16,7 +17,7 @@ function Sidebar() {
       {/* Logo Section */}
       <div className="flex justify-center mb-6">
         <img
-          src="./src/assets/logo.png"
+          src={logo}
           alt="SLT Logo"
           className="w-36 mt-2"
         />
