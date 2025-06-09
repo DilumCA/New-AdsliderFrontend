@@ -16,9 +16,12 @@ const Schema = () => {
   const fetchSchemes = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/schemes');
-      setSchemes(res.data);
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const res = await axios.get(`${baseUrl}/schemes`);
+      // Ensure res.data is an array
+      setSchemes(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
+      setSchemes([]); // Set to empty array on error
       console.error("Failed to fetch schemes:", err);
     } finally {
       setLoading(false);
@@ -36,10 +39,11 @@ const Schema = () => {
   };
 
   // Handler for saving (add or update)
- const handleSave = async (schemeData) => {
+const handleSave = async (schemeData) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
   if (editScheme && editScheme._id) {
     try {
-      await axios.put(`http://localhost:5000/api/schemes/${editScheme._id}`, schemeData);
+      await axios.put(`${baseUrl}/schemes/${editScheme._id}`, schemeData);
       await fetchSchemes();
       toast.success("Scheme updated successfully!");
     } catch (err) {
@@ -47,7 +51,7 @@ const Schema = () => {
     }
   } else {
     try {
-      await axios.post('http://localhost:5000/api/schemes', schemeData);
+      await axios.post(`${baseUrl}/schemes`, schemeData);
       await fetchSchemes();
       toast.success("Scheme added successfully!");
     } catch (err) {
@@ -73,7 +77,8 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
     const scheme = confirmDelete.scheme;
     setConfirmDelete({ open: false, scheme: null });
     try {
-      await axios.delete(`http://localhost:5000/api/schemes/${scheme._id}`);
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      await axios.delete(`${baseUrl}/schemes/${scheme._id}`);
       await fetchSchemes();
       toast.success("Scheme deleted!");
     } catch (err) {
