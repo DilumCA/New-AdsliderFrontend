@@ -4,6 +4,9 @@ import Sidebar from "../Components/Sidebar.jsx";
 import Navbar from "../Components/Navbar.jsx";
 import AddNewSchemeForm from "../Components/AddNewSchemeForm.jsx";
 import toast from 'react-hot-toast';
+import loupe from '../assets/loupe.png';
+import pen from '../assets/pen.png';
+import deleteIcon from '../assets/delete.png';
 
 const Schema = () => {
   const [open, setOpen] = useState(false);
@@ -170,7 +173,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   <img
-                    src="./src/assets/loupe.png"
+                   src={loupe}
                     alt="Search"
                     className="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
                   />
@@ -234,7 +237,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
               onClick={() => handleEditClick(scheme)}
             >
               <img
-                src="./src/assets/pen.png"
+                src={pen}
                 alt="Edit"
                 className="w-5 h-5 min-w-[20px] min-h-[20px] max-w-[22px] max-h-[22px]"
                 style={{ width: 22, height: 22 }}
@@ -247,7 +250,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
               onClick={() => handleDelete(scheme)}
             >
               <img
-                src="./src/assets/delete.png"
+                src={deleteIcon}
                 alt="Delete"
                 className="w-5 h-5 min-w-[20px] min-h-[20px] max-w-[22px] max-h-[22px]"
                 style={{ width: 22, height: 22 }}
