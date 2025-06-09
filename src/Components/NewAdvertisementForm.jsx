@@ -15,8 +15,9 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   const [selectedSchemes, setSelectedSchemes] = useState([]);
 
   // Fetch schemes from backend
-  useEffect(() => {
-    fetch('http://localhost:5000/api/schemes')
+    useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    fetch(`${baseUrl}/schemes`)
       .then(res => res.json())
       .then(data => setSchemes(data))
       .catch(() => setSchemes([]));
@@ -73,39 +74,40 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   // CREATE or UPDATE logic
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
     formData.append('startDate', startDate);
     formData.append('endDate', endDate);
-
+  
     selectedSchemes.forEach(id => formData.append('selectedSchemeIds', id));
     schemes
       .filter(s => selectedSchemes.includes(s._id))
       .forEach(s => formData.append('selectedSchemes', s.schemeTitle || s.title));
-
+  
     if (advertisementFile) {
       formData.append('advertisementURL', advertisementFile);
     }
-
-      try {
-      let url = 'http://localhost:5000/api/newadvertisements';
+  
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      let url = `${baseUrl}/newadvertisements`;
       let method = 'POST';
-    
+  
       if (editAd && editAd._id) {
-        url = `http://localhost:5000/api/newadvertisements/${editAd._id}`;
+        url = `${baseUrl}/newadvertisements/${editAd._id}`;
         method = 'PUT';
       }
-    
+  
       const res = await fetch(url, {
         method,
         body: formData,
       });
-    
+  
       if (!res.ok) throw new Error(editAd ? 'Failed to update advertisement' : 'Failed to create advertisement');
       toast.success(editAd ? 'Advertisement updated successfully!' : 'Advertisement created successfully!');
       if (onSuccess) onSuccess(); 
