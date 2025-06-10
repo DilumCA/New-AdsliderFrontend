@@ -9,8 +9,14 @@
       ]
     }
   ],
-  "routes": [
-    { "src": "^/(\\._darcs|\\.bzr|\\.hg|\\.darcs|BitKeeper)$", "status": 404 },
-    { "src": "/(.*)", "dest": "/" }
+  "redirects": [
+    {
+      "source": "/(.bzr|.hg|.darcs|BitKeeper|._darcs)",
+      "destination": "/404",
+      "statusCode": 404
+    }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
