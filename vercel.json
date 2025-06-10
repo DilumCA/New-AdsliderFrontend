@@ -3,22 +3,14 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://new-adslider-frontend.vercel.app"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; style-src 'self' ; img-src 'self' blob: https://adslider-backend.vercel.app https://new-adslider-backend.vercel.app https://res.cloudinary.com https://internetusage.slt.lk data:; connect-src 'self' https://adslider-backend.vercel.app https://new-adslider-backend.vercel.app; frame-ancestors 'none'; form-action 'self';"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        }
+        { "key": "Access-Control-Allow-Origin", "value": "https://new-adslider-frontend.vercel.app" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; style-src 'self'; img-src 'self' blob: https://adslider-backend.vercel.app https://new-adslider-backend.vercel.app https://res.cloudinary.com https://internetusage.slt.lk data:; connect-src 'self' https://adslider-backend.vercel.app https://new-adslider-backend.vercel.app; frame-ancestors 'none'; form-action 'self';" },
+        { "key": "X-Frame-Options", "value": "DENY" }
       ]
     }
   ],
   "rewrites": [
+    { "source": "/(._darcs|\\.bzr|\\.hg|\\.darcs|BitKeeper)", "destination": "/404" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
