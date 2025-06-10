@@ -74,3 +74,7 @@ dist-ssr
 *.sw?
 # Environment variables
 .env
+.bzr
+.hg
+.darcs
+BitKeeper
