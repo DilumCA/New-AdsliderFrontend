@@ -20,7 +20,7 @@ const Schema = () => {
     setLoading(true);
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const res = await axios.get(`${baseUrl}/schemes`);
+      const res = await axios.get(`${baseUrl}/api/schemes`);
       // Ensure res.data is an array
       setSchemes(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -46,7 +46,7 @@ const handleSave = async (schemeData) => {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
   if (editScheme && editScheme._id) {
     try {
-      await axios.put(`${baseUrl}/schemes/${editScheme._id}`, schemeData);
+      await axios.put(`${baseUrl}/api/schemes/${editScheme._id}`, schemeData);
       await fetchSchemes();
       toast.success("Scheme updated successfully!");
     } catch (err) {
@@ -54,7 +54,7 @@ const handleSave = async (schemeData) => {
     }
   } else {
     try {
-      await axios.post(`${baseUrl}/schemes`, schemeData);
+      await axios.post(`${baseUrl}/api/schemes`, schemeData);
       await fetchSchemes();
       toast.success("Scheme added successfully!");
     } catch (err) {
@@ -81,7 +81,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
     setConfirmDelete({ open: false, scheme: null });
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      await axios.delete(`${baseUrl}/schemes/${scheme._id}`);
+      await axios.delete(`${baseUrl}/api/schemes/${scheme._id}`);
       await fetchSchemes();
       toast.success("Scheme deleted!");
     } catch (err) {

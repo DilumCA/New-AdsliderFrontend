@@ -18,7 +18,7 @@ const Advertisements = () => {
  // Define fetchAds function
    const fetchAds = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    fetch(`${baseUrl}/newadvertisements`)
+    fetch(`${baseUrl}/api/newadvertisements`)
       .then(res => res.json())
       .then(data => setAdvertisements(data))
       .catch(() => setAdvertisements([]));
@@ -45,7 +45,7 @@ const Advertisements = () => {
     setConfirmDelete({ open: false, adId: null });
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const res = await fetch(`${baseUrl}/newadvertisements/${adId}`, {
+      const res = await fetch(`${baseUrl}/api/newadvertisements/${adId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete advertisement");

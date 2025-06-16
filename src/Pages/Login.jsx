@@ -21,18 +21,20 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  
     try {
-      const response = await axios.post("http://localhost:5000/auth/login", {
+      const response = await axios.post(`${baseUrl}/auth/login`, {
         username,
         password,
       });
-
+  
       const userData = response.data;
-
+  
       // Save user data to localStorage
       localStorage.setItem("userData", JSON.stringify(userData));
-
+  
       // Redirect based on role
       if (userData.role === "admin") {
         navigate("/dashboard"); // Redirect to admin dashboard
