@@ -17,7 +17,7 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   // Fetch schemes from backend
     useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    fetch(`${baseUrl}/schemes`)
+    fetch(`${baseUrl}/api/schemes`)
       .then(res => res.json())
       .then(data => setSchemes(data))
       .catch(() => setSchemes([]));
@@ -95,11 +95,11 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      let url = `${baseUrl}/newadvertisements`;
+      let url = `${baseUrl}/api/newadvertisements`;
       let method = 'POST';
   
       if (editAd && editAd._id) {
-        url = `${baseUrl}/newadvertisements/${editAd._id}`;
+        url = `${baseUrl}/api/newadvertisements/${editAd._id}`;
         method = 'PUT';
       }
   
