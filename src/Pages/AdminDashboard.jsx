@@ -104,7 +104,7 @@ function AdminDashboard() {
               </li>
               <li className="py-2 flex justify-between">
                 <span>User <span className="font-semibold">user@slt.com</span> assigned to Scheme 2</span>
-                <span className="text-gray-400 text-sm">5 hours ago</span>
+                <span className="text-gray-400 text-sm">6 hours ago</span>
               </li>
               <li className="py-2 flex justify-between">
                 <span>Scheme <span className="font-semibold">Scheme 4</span> updated</span>
