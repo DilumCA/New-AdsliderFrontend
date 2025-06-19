@@ -1,40 +1,23 @@
 import React, { useState } from "react";
+import SchemeAdsExplorer from "../Components/SchemeAdsExplorer";
 
 const Request = () => {
   const [schemas, setSchemas] = useState([]);
-  const [selectedSchema, setSelectedSchema] = useState("");
-  const [ads, setAds] = useState([]);
   const [loadingSchemas, setLoadingSchemas] = useState(false);
-  const [loadingAds, setLoadingAds] = useState(false);
 
-  // Simulated API call to fetch schemas
+  // Fetch schemas from backend
   const requestSchemas = async () => {
     setLoadingSchemas(true);
-    // Simulate delay
-    setTimeout(() => {
-      const fakeSchemaData = [
-        { id: "1", name: "Sports", tags: ["football", "cricket"] },
-        { id: "2", name: "Tech", tags: ["ai", "gadgets"] },
-        { id: "3", name: "Fashion", tags: ["clothes", "shoes"] },
-      ];
-      setSchemas(fakeSchemaData);
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const res = await fetch(`${baseUrl}/api/schemes`);
+      const data = await res.json();
+      setSchemas(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setSchemas([]);
+    } finally {
       setLoadingSchemas(false);
-    }, 1000);
-  };
-
-  // Simulated API call to fetch ads based on selected schema
-  const requestAds = async () => {
-    if (!selectedSchema) return;
-    setLoadingAds(true);
-    // Simulate delay
-    setTimeout(() => {
-      const fakeAdData = [
-        { id: "a1", title: `Ad 1 for ${selectedSchema}` },
-        { id: "a2", title: `Ad 2 for ${selectedSchema}` },
-      ];
-      setAds(fakeAdData);
-      setLoadingAds(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -67,17 +50,23 @@ const Request = () => {
                 <th className="py-3 px-4 text-left border-b">ID</th>
                 <th className="py-3 px-4 text-left border-b">Scheme Name</th>
                 <th className="py-3 px-4 text-left border-b">Tags</th>
+                <th className="py-3 px-4 text-left border-b">Description</th>
               </tr>
             </thead>
             <tbody>
               {schemas.map((schema) => (
-                <tr key={schema.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{schema.id}</td>
+                <tr key={schema._id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{schema._id}</td>
                   <td className="py-2 px-4 border-b font-medium text-gray-700">
-                    {schema.name}
+                    {schema.schemeTitle}
                   </td>
                   <td className="py-2 px-4 border-b text-gray-600">
-                    {schema.tags.join(", ")}
+                    {schema.schemeTags && schema.schemeTags.length > 0
+                      ? schema.schemeTags.join(", ")
+                      : "-"}
+                  </td>
+                  <td className="py-2 px-4 border-b text-gray-600">
+                    {schema.description}
                   </td>
                 </tr>
               ))}
@@ -86,46 +75,10 @@ const Request = () => {
         </div>
       )}
 
-      {/* Schema Selection and Request Ads */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
-        <select
-          value={selectedSchema}
-          onChange={(e) => setSelectedSchema(e.target.value)}
-          className="w-64 px-4 py-2 border border-gray-300 rounded shadow text-gray-700"
-        >
-          <option value="">Select a Schema</option>
-          {schemas.map((schema) => (
-            <option key={schema.id} value={schema.name}>
-              {schema.name}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={requestAds}
-          disabled={!selectedSchema || loadingAds}
-          className={`px-6 py-2 text-white rounded transition ${
-            !selectedSchema || loadingAds
-              ? "bg-green-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
-        >
-          {loadingAds ? "Loading Ads..." : "Request Ads"}
-        </button>
+      {/* Place SchemeAdsExplorer here */}
+      <div className="max-w-4xl mx-auto">
+        <SchemeAdsExplorer />
       </div>
-
-      {/* Advertisements */}
-      {ads.length > 0 && (
-        <div className="bg-white max-w-lg mx-auto p-6 rounded shadow">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-            Advertisements
-          </h2>
-          <ul className="space-y-3 list-disc list-inside text-gray-700">
-            {ads.map((ad) => (
-              <li key={ad.id}>{ad.title}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
