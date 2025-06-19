@@ -29,7 +29,7 @@ const CustomerHomepage = () => {
         const data = await res.json();
        console.log("Received data from backend:", data); // backend data is logged here
         // Filter ads with aiRelevance > 50
-        const filteredAds = (data.advertisements || []).filter(ad => ad.aiRelevance > 50);
+        const filteredAds = (data.advertisements || []).filter(ad => ad.aiRelevance > 0);
         setAdvertisements(
           filteredAds.map(ad => ({
             id: ad._id,
