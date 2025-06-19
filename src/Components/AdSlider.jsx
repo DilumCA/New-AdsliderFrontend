@@ -14,8 +14,10 @@ const AdSlider = ({ advertisements }) => {
 
   const goTo = (idx) => setCurrent(idx);
 
+  if (!advertisements || advertisements.length === 0) return null;
+
   return (
-    <div className="relative" style={{ height: 400 }}>
+    <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
       {/* Slides */}
       <div
         className="flex transition-transform duration-700 ease-in-out"

@@ -9,6 +9,7 @@ import CustomerHome from './Pages/CustomerHome.jsx';
 import CustomerHomes from './Pages/CustomerHomepage.jsx';
 import Profile from './Pages/Profile.jsx';
 import AdminDashboard from './Pages/AdminDashboard.jsx';
+import Request from './Pages/Request.jsx';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/schema" element={<Schema />} />
         <Route path="/customerhomes" element={<CustomerHomes />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/request" element={<Request />} />
       </Routes>
     </Router>
     </>
