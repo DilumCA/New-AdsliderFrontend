@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Select from "react-select";
 import AdSlider from "./AdSlider";
 
 const SchemeAdsExplorer = () => {
@@ -9,7 +8,6 @@ const SchemeAdsExplorer = () => {
   const [loading, setLoading] = useState(false);
   const [loadingSchemes, setLoadingSchemes] = useState(true);
 
-  // Fetch schemes from backend on mount
   useEffect(() => {
     const fetchSchemes = async () => {
       setLoadingSchemes(true);
@@ -27,7 +25,12 @@ const SchemeAdsExplorer = () => {
     fetchSchemes();
   }, []);
 
-  // Fetch ads for selected schemes
+  const handleCheckboxChange = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
   const fetchAds = async () => {
     if (selectedIds.length === 0) return;
     setLoading(true);
@@ -48,16 +51,6 @@ const SchemeAdsExplorer = () => {
     }
   };
 
-  // Prepare options for react-select
-  const options = schemes.map(s => ({
-    value: s._id,
-    label: s.schemeTitle || s.title
-  }));
-
-  // Prepare value for react-select
-  const selectedOptions = options.filter(opt => selectedIds.includes(opt.value));
-
-  // Prepare ads for AdSlider (id, image, title, description)
   const sliderAds = ads.map(ad => ({
     id: ad._id,
     image: ad.advertisementURL,
@@ -68,33 +61,36 @@ const SchemeAdsExplorer = () => {
   return (
     <div className="bg-white rounded-lg shadow p-8 my-8 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-blue-800">Find Advertisements by Scheme</h2>
-      <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
-        <div className="w-full md:w-1/2">
-          {loadingSchemes ? (
-            <div className="text-gray-500">Loading schemes...</div>
-          ) : (
-            <Select
-              isMulti
-              options={options}
-              value={selectedOptions}
-              onChange={selected => setSelectedIds(selected.map(opt => opt.value))}
-              placeholder="Select one or more schemes..."
-              className="react-select-container"
-              classNamePrefix="react-select"
-            />
-          )}
-        </div>
-        <button
-          onClick={fetchAds}
-          disabled={selectedIds.length === 0 || loading}
-          className="bg-gradient-to-r from-blue-800 via-blue-900 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold px-6 py-2 rounded shadow transition"
-        >
-          {loading ? "Loading..." : "Show Advertisements"}
-        </button>
+      <div className="mb-6">
+        {loadingSchemes ? (
+          <div className="text-gray-500">Loading schemes...</div>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {schemes.map(scheme => (
+              <label key={scheme._id} className="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer hover:bg-blue-50">
+                <input
+                  type="checkbox"
+                  value={scheme._id}
+                  checked={selectedIds.includes(scheme._id)}
+                  onChange={() => handleCheckboxChange(scheme._id)}
+                  className="accent-blue-600"
+                />
+                <span>{scheme.schemeTitle || scheme.title}</span>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
+      <button
+        onClick={fetchAds}
+        disabled={selectedIds.length === 0 || loading}
+        className="bg-gradient-to-r from-blue-800 via-blue-900 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold px-6 py-2 rounded shadow transition"
+      >
+        {loading ? "Loading..." : "Show Advertisements"}
+      </button>
       {ads.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {ads.map((ad) => (
               <div key={ad._id} className="bg-gray-50 rounded-lg shadow p-4 flex flex-col">
                 <img
