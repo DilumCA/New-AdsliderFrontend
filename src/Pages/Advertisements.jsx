@@ -56,9 +56,9 @@ const Advertisements = () => {
     }
   };
   return (
-    <div className="flex min-h-screen">
-               {/* <Toaster position="bottom-right" /> */}
-      <div className="w-64 flex-shrink-0">
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar always visible, minimized on small screens */}
+      <div className="w-16 md:w-64 flex-shrink-0">
         <Sidebar />
       </div>
       <div className="flex-1 flex flex-col">
@@ -66,6 +66,7 @@ const Advertisements = () => {
         <div className="sticky top-0 z-50 bg-white">
           <Navbar />
         </div>
+        {/* Modals */}
         {adModalOpen && (
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -84,20 +85,20 @@ const Advertisements = () => {
               >
                 &times;
               </button>
-             <NewAdvertisementForm
-  editAd={editAd}
-  onCancel={() => setAdModalOpen(false)}
-  onSuccess={() => {
-    setAdModalOpen(false);
-    fetchAds(); // Refresh the table after create/update
-  }}
-/>
+              <NewAdvertisementForm
+                editAd={editAd}
+                onCancel={() => setAdModalOpen(false)}
+                onSuccess={() => {
+                  setAdModalOpen(false);
+                  fetchAds();
+                }}
+              />
             </div>
           </div>
         )}
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col ml-4">
+        <div className="flex-1 flex flex-col p-4 sm:p-6">
           {/* Sticky Title & Search */}
           <div className="sticky top-16 z-40 bg-white pb-2">
             <h1 className="text-2xl font-bold mb-2 pt-2">Advertisement Management</h1>

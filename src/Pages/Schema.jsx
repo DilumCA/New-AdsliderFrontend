@@ -23,9 +23,9 @@ const Schema = () => {
       const res = await axios.get(`${baseUrl}/api/schemes`);
       // Ensure res.data is an array
       setSchemes(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
+    } catch {
       setSchemes([]); // Set to empty array on error
-      console.error("Failed to fetch schemes:", err);
+      console.error("Failed to fetch schemes");
     } finally {
       setLoading(false);
     }
@@ -50,6 +50,7 @@ const handleSave = async (schemeData) => {
       await fetchSchemes();
       toast.success("Scheme updated successfully!");
     } catch (err) {
+      console.error("Failed to update scheme:", err);
       toast.error("Failed to update scheme");
     }
   } else {
@@ -57,7 +58,7 @@ const handleSave = async (schemeData) => {
       await axios.post(`${baseUrl}/api/schemes`, schemeData);
       await fetchSchemes();
       toast.success("Scheme added successfully!");
-    } catch (err) {
+    } catch {
       toast.error("Failed to add scheme");
     }
   }
@@ -67,8 +68,6 @@ const handleSave = async (schemeData) => {
 
   // Handler for deleting a scheme
 const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null });
-
-  // ...fetchSchemes, useEffect, handleEditClick, handleSave...
 
   // Open modal for confirmation
   const handleDelete = (scheme) => {
@@ -85,6 +84,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
       await fetchSchemes();
       toast.success("Scheme deleted!");
     } catch (err) {
+      console.error("Failed to delete scheme:", err);
       toast.error("Failed to delete scheme");
     }
   };
@@ -94,8 +94,18 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
   );
 
   return (
-    <div className="flex min-h-screen">
-         {/* Delete Confirmation Modal */}
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar always visible, minimized on small screens */}
+      <div className="w-16 md:w-64 flex-shrink-0">
+        <Sidebar />
+      </div>
+      <div className="flex-1 flex flex-col">
+        {/* Sticky Navbar */}
+        <div className="sticky top-0 z-50 bg-white">
+          <Navbar />
+        </div>
+        {/* Modals */}
+        {/* Delete Confirmation Modal */}
       {confirmDelete.open && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
@@ -119,14 +129,6 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
           </div>
         </div>
       )}
-      <div className="w-64 flex-shrink-0">
-        <Sidebar />
-      </div>
-      <div className="flex-1 flex flex-col">
-        {/* Sticky Navbar */}
-        <div className="sticky top-0 z-50 bg-white">
-          <Navbar />
-        </div>
         {open && (
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -154,7 +156,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
           </div>
         )}
         {/* Content after Navbar with left margin */}
-        <div className="flex-1 flex flex-col ml-4">
+        <div className="flex-1 flex flex-col p-4 sm:p-6">
           {/* Sticky Title & Search */}
           <div className="sticky top-16 z-40 bg-white pb-2">
             <h1 className="text-2xl font-bold mb-2 pt-2">Scheme Management</h1>
@@ -162,7 +164,7 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
                 Search by Title:
               </label>
-              <div className="flex">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                 <div className="relative w-full max-w-md">
                   <input
                     type="text"
@@ -171,21 +173,23 @@ const [confirmDelete, setConfirmDelete] = useState({ open: false, scheme: null }
                     placeholder="Search Schemes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ minWidth: 0 }}
                   />
-                  <img
-                   src={loupe}
-                    alt="Search"
-                    className="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"
-                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center">
+                    <img
+                      src={loupe}
+                      alt="Search"
+                      className="w-5 h-5"
+                      style={{ minWidth: 20, minHeight: 20 }}
+                    />
+                  </span>
                 </div>
-                <div className="flex-1 flex justify-end items-center ml-4 pr-4 pb-2">
-                  <button
-                    className="bg-gradient-to-r from-blue-800 via-blue-900 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold px-4 py-2 rounded shadow transition"
-                    onClick={() => setOpen(true)}
-                  >
-                    + New Scheme
-                  </button>
-                </div>
+                <button
+                  className="bg-gradient-to-r from-blue-800 via-blue-900 to-blue-700 hover:from-blue-900 hover:to-blue-800 text-white font-semibold px-4 py-2 rounded shadow transition w-full sm:w-auto"
+                  onClick={() => setOpen(true)}
+                >
+                  + New Scheme
+                </button>
               </div>
             </div>
             <hr className="my-0 border-gray-300" />
