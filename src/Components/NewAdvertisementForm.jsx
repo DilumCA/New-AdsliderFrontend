@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ImageCropperModal from './ImageCropperModal'
 import toast from 'react-hot-toast';
+import CropSelector from './CropSelector' 
 
 function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -8,14 +9,14 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [advertisementFile, setAdvertisementFile] = useState(null);
-  const [cropModal, setCropModal] = useState({ open: false, id: null, src: null });
+  const [cropModal, setCropModal] = useState({ open: false, src: null, file: null });
   const [previews, setPreviews] = useState({ advertisementURL: null });
   const [loading, setLoading] = useState(false);
   const [schemes, setSchemes] = useState([]);
   const [selectedSchemes, setSelectedSchemes] = useState([]);
 
   // Fetch schemes from backend
-    useEffect(() => {
+  useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     fetch(`${baseUrl}/api/schemes`)
       .then(res => res.json())
@@ -51,18 +52,24 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setCropModal({ open: true, id: "advertisementURL", src: e.target.result });
+        setCropModal({ open: true, src: e.target.result, file });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Handle crop complete
-  const handleCropComplete = (croppedBlob, previewUrl) => {
+  // Handle crop complete from CropSelector
+  const handleCropConfirm = (previewUrl, cropData) => {
+    // previewUrl is the cropped image URL returned from backend
     setPreviews({ advertisementURL: previewUrl });
-    const croppedFile = new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" });
-    setAdvertisementFile(croppedFile);
-    setCropModal({ open: false, id: null, src: null });
+    // Optionally, you can fetch the blob and create a File if you want to upload it as a file
+    fetch(previewUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+        setAdvertisementFile(croppedFile);
+      });
+    setCropModal({ open: false, src: null, file: null });
   };
 
   const handleSchemeChange = (scheme) => {
@@ -72,45 +79,44 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
         : [...prev, scheme]
     );
   };
-
-  // CREATE or UPDATE logic
-    const handleSubmit = async (e) => {
+// CREATE or UPDATE logic
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
     formData.append('startDate', startDate);
     formData.append('endDate', endDate);
-  
+
     selectedSchemes.forEach(id => formData.append('selectedSchemeIds', id));
     schemes
       .filter(s => selectedSchemes.includes(s._id))
       .forEach(s => formData.append('selectedSchemes', s.schemeTitle || s.title));
-  
+
     if (advertisementFile) {
       formData.append('advertisementURL', advertisementFile);
     }
-  
+
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       let url = `${baseUrl}/api/newadvertisements`;
       let method = 'POST';
-  
+
       if (editAd && editAd._id) {
         url = `${baseUrl}/api/newadvertisements/${editAd._id}`;
         method = 'PUT';
       }
-  
+
       const res = await fetch(url, {
         method,
         body: formData,
       });
-  
+
       if (!res.ok) throw new Error(editAd ? 'Failed to update advertisement' : 'Failed to create advertisement');
       toast.success(editAd ? 'Advertisement updated successfully!' : 'Advertisement created successfully!');
-      if (onSuccess) onSuccess(); 
+      if (onSuccess) onSuccess();
       if (onCancel) onCancel();
     } catch (err) {
       toast.error('Error: ' + err.message);
@@ -120,19 +126,33 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   return (
-    <div>
+  <div>
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
         {editAd ? "Edit Advertisement" : "Create New Advertisement"}
       </h2>
-      {cropModal.open && (
-        <ImageCropperModal
-          open={cropModal.open}
-          imageSrc={cropModal.src}
-          onClose={() => setCropModal({ open: false, id: null, src: null })}
-          onCropComplete={handleCropComplete}
-          aspect={2.5}
-        />
-      )}
+             {cropModal.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setCropModal({ open: false, src: null, file: null })}>
+              <div
+                className="bg-white rounded-lg shadow-lg p-8 relative w-[600px] max-w-full"
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
+                  onClick={() => setCropModal({ open: false, src: null, file: null })}
+                  aria-label="Close"
+                  type="button"
+                >
+                  &times;
+                </button>
+                <CropSelector
+                  imageSrc={cropModal.src}
+                  originalFile={cropModal.file}
+                  onCropConfirm={handleCropConfirm}
+                  onCancel={() => setCropModal({ open: false, src: null, file: null })}
+                />
+              </div>
+            </div>
+          )}
       <form className="space-y-5" onSubmit={handleSubmit}>
         {/* Title */}
         <div>
@@ -196,7 +216,7 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
             required
           />
         </div>
-        {/* Advertisement Upload */}
+      {/* Advertisement Upload */}
         <div>
           <label htmlFor="advertisementURL" className="block text-sm font-medium text-gray-700">
             Advertisement Image:
