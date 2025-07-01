@@ -58,18 +58,16 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   // Handle crop complete from CropSelector
-  const handleCropConfirm = (previewUrl, cropData) => {
-    // previewUrl is the cropped image URL returned from backend
-    setPreviews({ advertisementURL: previewUrl });
-    // Optionally, you can fetch the blob and create a File if you want to upload it as a file
-    fetch(previewUrl)
-      .then(res => res.blob())
-      .then(blob => {
-        const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-        setAdvertisementFile(croppedFile);
-      });
-    setCropModal({ open: false, src: null, file: null });
-  };
+const handleCropConfirm = async (previewUrl, cropData) => {
+  // previewUrl is the cropped image URL returned from backend
+  setPreviews({ advertisementURL: previewUrl });
+  // Fetch the blob and create a File to upload
+  const res = await fetch(previewUrl);
+  const blob = await res.blob();
+  const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+  setAdvertisementFile(croppedFile);
+  setCropModal({ open: false, src: null, file: null });
+};
 
   const handleSchemeChange = (scheme) => {
     setSelectedSchemes(prev =>
