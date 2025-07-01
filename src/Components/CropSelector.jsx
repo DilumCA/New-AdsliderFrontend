@@ -16,7 +16,7 @@ async function cropImage(file, crop) {
   });
 
   if (response.status !== 200) throw new Error("Crop failed");
-  return URL.createObjectURL(response.data);
+  return response.data; // Return the blob directly
 }
 
 const CONTAINER_WIDTH = 500;
@@ -194,19 +194,20 @@ const CropSelector = ({ imageSrc, originalFile, onCropConfirm, onCancel }) => {
   };
 
   // Confirm crop: call backend and return preview URL
-  const handleConfirm = async () => {
-    if (!originalFile) return;
-    setLoading(true);
-    try {
-      const cropData = getCropData();
-      const previewUrl = await cropImage(originalFile, cropData);
-      onCropConfirm(previewUrl, cropData);
-    } catch (err) {
-      alert("Cropping failed: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleConfirm = async () => {
+  if (!originalFile) return;
+  setLoading(true);
+  try {
+    const cropData = getCropData();
+    const blob = await cropImage(originalFile, cropData);
+    const previewUrl = URL.createObjectURL(blob);
+    onCropConfirm({ blob, previewUrl }, cropData); // Pass both blob and previewUrl
+  } catch (err) {
+    alert("Cropping failed: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Attach mousemove/mouseup to window for resizing/dragging
   useEffect(() => {
