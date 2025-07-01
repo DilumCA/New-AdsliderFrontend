@@ -58,19 +58,18 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   // Handle crop complete from CropSelector
-  const handleCropConfirm = async (previewUrl, cropData) => {
-    setPreviews({ advertisementURL: previewUrl });
-    // Fetch the blob and create a File to upload (using axios)
-    try {
-      const res = await axios.get(previewUrl, { responseType: 'blob' });
-      const blob = res.data;
-      const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-      setAdvertisementFile(croppedFile);
-    } catch (err) {
-      toast.error('Failed to fetch cropped image');
-    }
-    setCropModal({ open: false, src: null, file: null });
-  };
+const handleCropConfirm = async (previewUrl, cropData) => {
+  setPreviews({ advertisementURL: previewUrl });
+  try {
+    const res = await fetch(previewUrl);
+    const blob = await res.blob();
+    const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+    setAdvertisementFile(croppedFile);
+  } catch (err) {
+    toast.error('Failed to fetch cropped image');
+  }
+  setCropModal({ open: false, src: null, file: null });
+};
 
   const handleSchemeChange = (scheme) => {
     setSelectedSchemes(prev =>
