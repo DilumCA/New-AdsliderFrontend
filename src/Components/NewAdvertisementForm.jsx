@@ -58,15 +58,13 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   // Handle crop complete from CropSelector
-const handleCropConfirm = async (previewUrl, cropData) => {
+const handleCropConfirm = async ({ blob, previewUrl }, cropData) => {
   setPreviews({ advertisementURL: previewUrl });
   try {
-    const res = await fetch(previewUrl);
-    const blob = await res.blob();
     const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-    setAdvertisementFile(croppedFile);
+    setAdvertisementFile(croppedFile); // Use blob directly
   } catch (err) {
-    toast.error('Failed to fetch cropped image');
+    toast.error('Failed to process cropped image');
   }
   setCropModal({ open: false, src: null, file: null });
 };
