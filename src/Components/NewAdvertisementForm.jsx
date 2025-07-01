@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import toast from 'react-hot-toast';
-import CropSelector from './CropSelector' 
+import axios from 'axios';
+import CropSelector from './CropSelector'
 
 function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   const [title, setTitle] = useState('');
@@ -17,9 +18,8 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   // Fetch schemes from backend
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    fetch(`${baseUrl}/api/schemes`)
-      .then(res => res.json())
-      .then(data => setSchemes(data))
+    axios.get(`${baseUrl}/api/schemes`)
+      .then(res => setSchemes(res.data))
       .catch(() => setSchemes([]));
   }, []);
 
@@ -58,16 +58,19 @@ function NewAdvertisementForm({ editAd, onCancel, onSuccess }) {
   };
 
   // Handle crop complete from CropSelector
-const handleCropConfirm = async (previewUrl, cropData) => {
-  // previewUrl is the cropped image URL returned from backend
-  setPreviews({ advertisementURL: previewUrl });
-  // Fetch the blob and create a File to upload
-  const res = await fetch(previewUrl);
-  const blob = await res.blob();
-  const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-  setAdvertisementFile(croppedFile);
-  setCropModal({ open: false, src: null, file: null });
-};
+  const handleCropConfirm = async (previewUrl, cropData) => {
+    setPreviews({ advertisementURL: previewUrl });
+    // Fetch the blob and create a File to upload (using axios)
+    try {
+      const res = await axios.get(previewUrl, { responseType: 'blob' });
+      const blob = res.data;
+      const croppedFile = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+      setAdvertisementFile(croppedFile);
+    } catch (err) {
+      toast.error('Failed to fetch cropped image');
+    }
+    setCropModal({ open: false, src: null, file: null });
+  };
 
   const handleSchemeChange = (scheme) => {
     setSelectedSchemes(prev =>
@@ -76,7 +79,8 @@ const handleCropConfirm = async (previewUrl, cropData) => {
         : [...prev, scheme]
     );
   };
-// CREATE or UPDATE logic
+
+  // CREATE or UPDATE logic
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -99,57 +103,58 @@ const handleCropConfirm = async (previewUrl, cropData) => {
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
       let url = `${baseUrl}/api/newadvertisements`;
-      let method = 'POST';
+      let method = 'post';
 
       if (editAd && editAd._id) {
         url = `${baseUrl}/api/newadvertisements/${editAd._id}`;
-        method = 'PUT';
+        method = 'put';
       }
 
-      const res = await fetch(url, {
+      await axios({
         method,
-        body: formData,
+        url,
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (!res.ok) throw new Error(editAd ? 'Failed to update advertisement' : 'Failed to create advertisement');
       toast.success(editAd ? 'Advertisement updated successfully!' : 'Advertisement created successfully!');
       if (onSuccess) onSuccess();
       if (onCancel) onCancel();
     } catch (err) {
-      toast.error('Error: ' + err.message);
+      toast.error('Error: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-  <div>
+    <div>
       <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
         {editAd ? "Edit Advertisement" : "Create New Advertisement"}
       </h2>
-             {cropModal.open && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setCropModal({ open: false, src: null, file: null })}>
-              <div
-                className="bg-white rounded-lg shadow-lg p-8 relative w-[600px] max-w-full"
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
-                  onClick={() => setCropModal({ open: false, src: null, file: null })}
-                  aria-label="Close"
-                  type="button"
-                >
-                  &times;
-                </button>
-                <CropSelector
-                  imageSrc={cropModal.src}
-                  originalFile={cropModal.file}
-                  onCropConfirm={handleCropConfirm}
-                  onCancel={() => setCropModal({ open: false, src: null, file: null })}
-                />
-              </div>
-            </div>
-          )}
+      {cropModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setCropModal({ open: false, src: null, file: null })}>
+          <div
+            className="bg-white rounded-lg shadow-lg p-8 relative w-[600px] max-w-full"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
+              onClick={() => setCropModal({ open: false, src: null, file: null })}
+              aria-label="Close"
+              type="button"
+            >
+              &times;
+            </button>
+            <CropSelector
+              imageSrc={cropModal.src}
+              originalFile={cropModal.file}
+              onCropConfirm={handleCropConfirm}
+              onCancel={() => setCropModal({ open: false, src: null, file: null })}
+            />
+          </div>
+        </div>
+      )}
       <form className="space-y-5" onSubmit={handleSubmit}>
         {/* Title */}
         <div>
@@ -213,7 +218,7 @@ const handleCropConfirm = async (previewUrl, cropData) => {
             required
           />
         </div>
-      {/* Advertisement Upload */}
+        {/* Advertisement Upload */}
         <div>
           <label htmlFor="advertisementURL" className="block text-sm font-medium text-gray-700">
             Advertisement Image:

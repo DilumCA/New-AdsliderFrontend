@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
-// Helper function to call the backend crop API
+// Helper function to call the backend crop API using axios
 async function cropImage(file, crop) {
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
   const formData = new FormData();
