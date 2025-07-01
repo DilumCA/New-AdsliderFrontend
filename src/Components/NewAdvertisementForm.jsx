@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import ImageCropperModal from './ImageCropperModal'
 import toast from 'react-hot-toast';
 import CropSelector from './CropSelector' 
 
