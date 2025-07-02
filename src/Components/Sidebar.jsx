@@ -4,7 +4,7 @@ import logo from '../assets/logo.png';
 
 // You can use react-icons or similar for icons, here using emoji as placeholders
 const navItems = [
-  { text: 'Dashboard', to: '/dashboard', icon: '🏠' },
+  { text: 'Dashboard', to: '/dashboard', icon: '📈' },
   { text: 'Advertisements', to: '/admanage', icon: '📢' },
   { text: 'Schemes', to: '/schema', icon: '📋' },
   { text: 'Settings', to: '/settings', icon: '⚙️' },
